@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'teams.apps.TeamsConfig',
     'cards.apps.CardsConfig',
+    'players.apps.PlayersConfig'
 ]
 
 REST_FRAMEWORK = {
