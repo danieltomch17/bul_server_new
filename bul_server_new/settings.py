@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-e#i3ozc%h1vt-a=(3sfs-1w5eh20k+h(uv86_!@-rjy9f&u#cl
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -49,6 +49,9 @@ INSTALLED_APPS = [
     'cards.apps.CardsConfig',
     'players.apps.PlayersConfig',
     'leagues.apps.LeaguesConfig',
+    'bul_calendar.apps.BulCalendarConfig',
+    'game.apps.GameConfig',
+
 ]
 
 REST_FRAMEWORK = {

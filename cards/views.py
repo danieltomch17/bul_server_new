@@ -12,7 +12,7 @@ from rest_framework.decorators import permission_classes
 
 # Create your views here.
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+
 def card_get_all(request):
     if request.method == 'GET':
         cards = Card.objects.all()
