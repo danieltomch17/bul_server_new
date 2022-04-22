@@ -8,6 +8,7 @@ from accounts.serializers import UserSerializer
 
 from django.contrib.auth.models import User
 from cards.models import Card
+from cards.views import create_random_card
 from teams.models import Team
 
 from rest_framework.permissions import IsAuthenticated
@@ -30,7 +31,8 @@ def user_create(request):
 
                 # generate 5 random cards
                 for i in range(5):
-                    card = Card.objects.create(team_id = team, player_name = 'Salim Suliman')
+                    # need to create 5 random cards
+                    create_random_card(team)
                 
                 return Response(user_serializer.data, status=status.HTTP_201_CREATED)
 

@@ -8,3 +8,6 @@ class Team(models.Model):
     team_name = models.CharField(max_length=50)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     logo = models.CharField(max_length=500)
+
+    def __str__(self):
+        return self.team_name

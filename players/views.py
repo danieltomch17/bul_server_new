@@ -1,5 +1,11 @@
+import json
+from operator import attrgetter
+import random
 from django.shortcuts import render
 from django.http.response import JsonResponse
+from django.http.response import HttpResponse
+from httplib2 import Http
+import players
 
 from players.serializers import PlayerSerializer
 
@@ -23,6 +29,7 @@ def player_get_all(request):
 
         return JsonResponse(players_serializer.data, safe=False)
 
+# Get updated list of players and update the DB
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def update_players_db_from_api(request):
@@ -94,3 +101,54 @@ def update_players_db_from_api(request):
         )
         
     return JsonResponse(json_res)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def val_min_max(request):
+    
+    if request.method == 'GET':
+        players = Player.objects.all()
+        player_ser = PlayerSerializer(players, many=True)
+        max_val = max(p["VAL"] for p in player_ser.data)
+        min_val = min(p["VAL"] for p in player_ser.data)
+
+
+        return JsonResponse({'maxval':max_val,'minval':min_val}, safe=False)
+    """
+    get_random_player()
+    print()
+    get_random_player()
+    print()
+    get_random_player()
+    """
+
+    return HttpResponse(status=200)
+# internal functions
+
+
+def get_random_player():
+    players = Player.objects.all()
+    player_ser = PlayerSerializer(players, many=True)
+    max_val = max(p["VAL"] for p in player_ser.data)
+    min_val = min(p["VAL"] for p in player_ser.data)
+    full_val_range = max_val - min_val
+    rarity = random.choices([0,1,2,3], weights=(60,25,10,5))[0]
+    new_player_min_val = min_val + (rarity * full_val_range/4)
+    new_player_max_val = min_val + ((rarity+1) * full_val_range/4)
+    players = Player.objects.filter(VAL__gt=new_player_min_val, VAL__lt=new_player_max_val)
+    player_data = PlayerSerializer(players, many=True).data
+    rand_player = player_data[random.randrange(0,len(player_data))]
+    
+    return rand_player
+
+    """
+    print(max_val,
+    min_val,
+    full_val_range,
+    rarity,
+    new_player_min_val,
+    new_player_max_val,
+    len(player_data),
+    json.dumps(rand_player)
+    )
+    """
