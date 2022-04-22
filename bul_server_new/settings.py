@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'players.apps.PlayersConfig',
     'leagues.apps.LeaguesConfig',
     'bul_calendar.apps.BulCalendarConfig',
+     'friends.apps.FriendsConfig',
     'game.apps.GameConfig',
 
 ]
@@ -63,7 +64,6 @@ REST_FRAMEWORK = {
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -73,7 +73,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:8000',
 )
