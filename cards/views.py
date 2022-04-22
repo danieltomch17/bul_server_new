@@ -64,4 +64,6 @@ def create_random_card(team):
         plusminus = player.get("plusminus"),
         dunks = player.get("dunks"),
     )
+
+    return card
     

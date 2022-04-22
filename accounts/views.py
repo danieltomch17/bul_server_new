@@ -32,7 +32,9 @@ def user_create(request):
                 # generate 5 random cards
                 for i in range(5):
                     # need to create 5 random cards
-                    create_random_card(team)
+                    card = create_random_card(team)
+                    card.is_first_five = True
+                    card.save()
                 
                 return Response(user_serializer.data, status=status.HTTP_201_CREATED)
 

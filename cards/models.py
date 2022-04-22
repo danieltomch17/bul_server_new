@@ -5,7 +5,8 @@ from teams.models import Team
 # Create your models here.
 class Card(models.Model):
     team_id = models.ForeignKey(Team, on_delete=models.CASCADE, default=0)
-
+    is_first_five = models.BooleanField(default=False)
+    
     # player info
     player_name = models.CharField(max_length=50, default=0)
     pic = models.CharField(max_length=50, default=0)
