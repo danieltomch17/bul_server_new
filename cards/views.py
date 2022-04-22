@@ -11,12 +11,17 @@ from rest_framework.decorators import api_view
 from rest_framework.decorators import permission_classes
 
 from players.views import get_random_player
+from teams.models import Team
 
 # Create your views here.
 @api_view(['GET'])
 def card_get_all(request):
     if request.method == 'GET':
-        cards = Card.objects.all()
+        uid = request.user.id
+        teams = Team.objects.filter(user_id__id = uid)
+        team = teams.first()
+        print(team)
+        cards = Card.objects.filter(team_id__team_id = team.team_id)
         cards_serializer = CardSerializer(cards, many=True)
 
         return JsonResponse(cards_serializer.data, safe=False)
