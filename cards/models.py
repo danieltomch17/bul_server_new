@@ -41,3 +41,13 @@ class Card(models.Model):
 
     def __str__(self):
         return self.player_name
+
+
+class CardPack(models.Model):
+    pack_name = models.CharField(max_length=50, default="")
+    price = models.CharField(max_length=50, default=0)
+    pack_type = models.CharField(max_length=50, default="Normal")
+    pack_image = models.CharField(max_length=500, default="")
+  
+    def __str__(self):
+        return self.pack_name

@@ -1,5 +1,5 @@
 from rest_framework import serializers 
-from cards.models import Card
+from cards.models import Card, CardPack
  
  
 class CardSerializer(serializers.ModelSerializer):
@@ -35,4 +35,19 @@ class CardSerializer(serializers.ModelSerializer):
                 'VAL',
                 'plusminus',
                 'dunks'
+        )
+
+from rest_framework import serializers 
+from cards.models import Card
+ 
+ 
+class CardPackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CardPack
+        fields = ('pack_name',
+                'id',
+                'price',
+                'pack_type',
+                'pack_image',
+                
         )
