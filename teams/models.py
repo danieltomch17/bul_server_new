@@ -10,4 +10,4 @@ class Team(models.Model):
     logo = models.CharField(max_length=500)
 
     def __str__(self):
-        return self.team_name
+        return '({}) {}'.format(self.pk, self.team_name)

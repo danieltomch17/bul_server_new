@@ -25,5 +25,6 @@ urlpatterns = [
     url(r'players/', include('players.urls')),
     url('calendar/', include('bul_calendar.urls')),
     url('friends/', include('friends.urls')),
+    url('game/', include('game.urls')),
   #  url(r'leagues/', include('leagues.urls')),
 ]
