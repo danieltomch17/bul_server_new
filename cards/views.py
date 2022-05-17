@@ -25,6 +25,17 @@ def card_get_all(request):
 
         return JsonResponse(cards_serializer.data, safe=False)
 
+@api_view(['GET'])
+def card_get_five_open(request):
+    if request.method == 'GET':
+        uid = request.user.id
+        teams = Team.objects.filter(user_id__id = uid)
+        team = teams.first()
+        cards = Card.objects.filter(team_id__team_id = team.team_id , is_first_five=True)
+        cards_serializer = CardSerializer(cards, many=True)
+
+        return JsonResponse(cards_serializer.data, safe=False)
+
 
 
 @api_view(['POST'])
@@ -36,13 +47,14 @@ def set_opening_team(request):
         cards = request.data.get('cards', [])
         cards_to_false = Card.objects.filter(team_id__team_id = team.team_id)
         for card in cards_to_false :
-            card = Card.objects.filter(team_id__team_id = team.team_id)
-            card.is_first_five = False
-
-        for card in cards :
-            card = Card.objects.filter(team_id__team_id = team.team_id , player_name=card.player_name)
+            card_from_db = Card.objects.filter(team_id__team_id = team.team_id, player_name=card)[0]
+            card_from_db.is_first_five = False
+            card_from_db.save()
+        for card_to_five in cards :
+            card = Card.objects.filter(team_id__team_id = team.team_id , player_name=card_to_five['player_name'])[0]
             card.is_first_five = True
-        cards_serializer = CardSerializer(cards, many=True)
+            card.save()
+        cards_serializer = CardSerializer(cards_to_false, many=True)
 
         return JsonResponse(cards_serializer.data, safe=False)
 
