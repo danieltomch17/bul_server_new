@@ -11,4 +11,4 @@ class Team(models.Model):
     cash = models.CharField(max_length=50, default=10000)
     real_cash = models.CharField(max_length=50, default=0)
     def __str__(self):
-        return self.team_name
+        return '({}) {}'.format(self.pk, self.team_name)
