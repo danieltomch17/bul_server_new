@@ -20,5 +20,4 @@ def team_get_all(request):
     if request.method == 'GET':
         teams = Team.objects.all()
         teams_serializer = TeamSerializer(teams, many=True)
-
         return JsonResponse(teams_serializer.data, safe=False)

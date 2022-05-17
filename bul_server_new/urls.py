@@ -21,9 +21,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'users/', include('accounts.urls')),
     url(r'teams/', include('teams.urls')),
-    url(r'cards/', include('cards.urls')),
     url(r'players/', include('players.urls')),
     url('calendar/', include('bul_calendar.urls')),
     url('friends/', include('friends.urls')),
+    url('cards/', include('cards.urls')),
   #  url(r'leagues/', include('leagues.urls')),
 ]
