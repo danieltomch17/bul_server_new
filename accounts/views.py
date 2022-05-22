@@ -9,6 +9,7 @@ from accounts.serializers import UserSerializer
 from django.contrib.auth.models import User
 from cards.models import Card
 from cards.views import create_random_card
+from leagues.models import League
 from teams.models import Team
 
 from rest_framework.permissions import IsAuthenticated
@@ -27,7 +28,15 @@ def user_create(request):
             if user:
                 
                 # create a team for the user
-                team = Team.objects.create(user_id = user, team_name = request.data['team_name'])
+                league_id = League.objects.filter(is_full = False).first().id
+                join_league_queryset = League.objects.filter(id = league_id)
+                join_league = join_league_queryset.first()
+                
+                team = Team.objects.create(user_id = user, team_name = request.data['team_name'], league = join_league)
+                
+                league_num_of_teams = join_league.num_of_teams + 1
+                join_league_queryset.update(num_of_teams = league_num_of_teams)
+                if league_num_of_teams == 8 : join_league_queryset.update(is_full = True)
 
                 # generate 5 random cards
                 for i in range(5):

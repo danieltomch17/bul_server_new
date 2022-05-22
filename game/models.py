@@ -1,3 +1,6 @@
+
+from pyexpat import model
+from django.utils.timezone import now
 from django.db import models
 from cards.models import Card
 from teams.models import Team
@@ -11,7 +14,9 @@ class Step(models.Model):
 class Game(models.Model):
     team_a = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team_a_game_set')
     team_b = models.ForeignKey(Team, on_delete=models.CASCADE , related_name='team_b_game_set')
-    date = models.DateField()
+    date = models.DateField(default=now)
+    time = models.TimeField(default=now)
     results =  models.CharField(max_length=50)
-    steps = models.ManyToManyField(Step)
 
+    def __str__(self):
+        return "{} {}: {} vs. {}".format(self.date, self.time, self.team_a.team_name, self.team_b.team_name)
