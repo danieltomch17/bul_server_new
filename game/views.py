@@ -16,7 +16,7 @@ from rest_framework.decorators import api_view
 
 from cards.models import Card
 from game.models import Game 
-from leagues.models import League
+from leagues.models import League, LeagueEntry
 from game.serializers import GameSerializer
 from teams.models import Team
 
@@ -47,6 +47,7 @@ Away team starts in area 3
 class team(Enum):
     HOME = 0
     AWAY = 1
+    TIE = 2
 
 
 class court_area(Enum):
@@ -84,10 +85,10 @@ att_bonuses = None
 c_home_advantage = 1.1
 
 # the length of a quarter in seconds
-quarter_time_sec = 10#60
-qurter_delay = 1#3
-attack_delay = 0.1#0.5
-move_delay = 0.05#0.2
+quarter_time_sec = 3#60
+qurter_delay = 0.3#3
+attack_delay = 0.033#0.5
+move_delay = 0.015#0.2
 
 @api_view(['GET'])
 def get_game_history(request):
@@ -186,8 +187,35 @@ def start_game(request, home_id, away_id): # for now team numbers are hard coded
     # save game to DB
     Game.objects.create(team_a=home_team, team_b=away_team, results="{} : {}".format(scores[team.HOME.value], scores[team.AWAY.value]))
 
+    winner = team.TIE
+
+    # update league entries
+    if scores[team.HOME.value] > scores[team.AWAY.value]:
+        winner = team.HOME
+    elif scores[team.HOME.value] < scores[team.AWAY.value]:
+        winner = team.AWAY
+
+    update_league_entries(home_team, away_team, winner)
+
     return JsonResponse(events_log, status=200, safe=False)
 
+
+def update_league_entries(home_team, away_team, winner):
+    home_entry_queryset = LeagueEntry.objects.filter(team=home_team).filter(is_active=True)
+    away_entry_queryset = LeagueEntry.objects.filter(team=away_team).filter(is_active=True)
+
+    home_entry = home_entry_queryset.first()
+    away_entry = away_entry_queryset.first()
+
+    if winner == team.HOME:
+        home_entry_queryset.update(wins=home_entry.wins+1)
+        away_entry_queryset.update(losses=away_entry.losses+1)
+    elif winner == team.AWAY:
+        home_entry_queryset.update(losses=home_entry.losses+1)
+        away_entry_queryset.update(wins=away_entry.wins+1)
+    elif winner == team.TIE:
+        home_entry_queryset.update(ties=home_entry.ties+1)
+        away_entry_queryset.update(ties=away_entry.ties+1)
 
 # add more statistic considerations here
 def get_team_def_score(cards) :
