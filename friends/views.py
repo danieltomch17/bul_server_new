@@ -8,20 +8,20 @@ from rest_framework.decorators import permission_classes
 
 from .models import Friends, Chat
 from teams.models import Team
-from .serializers import FriendsSerializer, ChatSerializer
+from .serializers import FriendsSerializer, ChatSerializer, FriendsRequestSerializer
 from datetime import date, timedelta
 
 
-#working
+
 @api_view(['GET'])
-def get_all_friends_by_user_team(request, pk):
+def get_all_friends_by_user_team(request):
     if request.method == 'GET':
         user = request.user.id
-        friends = Friends.objects.filter(team_a__user_id__id=user)
+        friends = Friends.objects.filter(team_a__user_id__id=user , accepted=True)
         friends_serializer = FriendsSerializer(friends, many=True)
         return JsonResponse(friends_serializer.data, safe=False)
 
-#working
+
 @api_view(['POST'])
 def remove_friend_by_team_id(request):
     if request.method == 'POST':
@@ -85,3 +85,39 @@ def update_msg_viewed(request):
         chat.viewed = True
         chat.save()
         return JsonResponse("Done", safe=False)
+
+@api_view(['POST'])
+def add_friend(request):
+    if request.method == 'POST':
+        uid = request.user.id
+        to_team_id = request.data.get('team_id', -1)
+        print(to_team_id)
+        team_send_to = Team.objects.filter(team_id=to_team_id)[0]
+        current_team =  Team.objects.filter(user_id__id = uid)[0]
+        if(to_team_id != -1  and current_team != team_send_to):
+            create_friend_request = Friends.objects.create(team_a =current_team , team_b = team_send_to ,accepted = False)
+            return JsonResponse("Done", safe=False)
+        else:
+             return JsonResponse("error")
+
+@api_view(['POST'])
+def accept_friend_request(request):
+    if request.method == 'POST':
+        uid = request.user.id
+        to_team_id = request.data.get('team_id', -1)
+        team_send_to = Team.objects.filter(team_id=to_team_id)[0]
+        current_team =  Team.objects.filter(user_id__id = uid)[0]
+        if(to_team_id != -1 and current_team != team_send_to):
+            change_friend_request_to_true = Friends.objects.filter(team_a=team_send_to , team_b = current_team).update(accepted=True)
+            create_friend_request = Friends.objects.create(team_a =current_team , team_b = team_send_to, accepted = True)
+            return JsonResponse("Done", safe=False)
+        else:
+             return JsonResponse("error")
+
+@api_view(['GET'])
+def get_all_friend_requests(request):
+    if request.method == 'GET':
+        user = request.user.id
+        friends = Friends.objects.filter(team_b__user_id__id=user , accepted=False)
+        friends_serializer = FriendsRequestSerializer(friends, many=True)
+        return JsonResponse(friends_serializer.data, safe=False)

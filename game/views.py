@@ -19,6 +19,9 @@ from game.models import Game
 from leagues.models import League, LeagueEntry
 from game.serializers import GameSerializer
 from teams.models import Team
+from teams.serializers import TeamSerializer
+from bul_calendar.models import Calendar
+import json
 
 """
 TODO:
@@ -80,7 +83,9 @@ def_stats = None
 att_stats = None
 def_bonuses = None
 att_bonuses = None
-
+away_team = None
+home_team = None
+done = False
 # game logic constants (in percents)
 c_home_advantage = 1.1
 
@@ -89,6 +94,7 @@ quarter_time_sec = 3#60
 qurter_delay = 0.3#3
 attack_delay = 0.033#0.5
 move_delay = 0.015#0.2
+
 
 @api_view(['GET'])
 def get_game_history(request):
@@ -100,14 +106,20 @@ def get_game_history(request):
 
     return JsonResponse(game_serializer.data, status=200, safe=False)
 
+@api_view(['GET'])
+def done_game(request):
+    done = False
+    return JsonResponse("Done", status=200, safe=False)
+
 
 @api_view(['GET'])
 def get_logs(request, from_id):
 
     if from_id > len(events_log):
         return HttpResponse(status=204)
-
-    res = events_log[from_id:-1]
+    home_team_teams_serializer = TeamSerializer(home_team)
+    away_team_teams_serializer = TeamSerializer(away_team)
+    res = {'home_team':home_team_teams_serializer.data, 'away_team':away_team_teams_serializer.data,'logs':events_log[from_id:-1]}
 
     return JsonResponse(res, status=200, safe=False)
 
@@ -115,9 +127,11 @@ def get_logs(request, from_id):
 def start_game(home_team, away_team):
 """
 @api_view(['GET'])
-def start_game(request, home_id, away_id): # for now team numbers are hard coded
-    global cards, scores, possession, events_log, def_stats, att_stats, def_bonuses, att_bonuses
+def start_game(request, home_id, away_id , date): # for now team numbers are hard coded
+    global cards, scores, possession, events_log, def_stats, att_stats, def_bonuses, att_bonuses , home_team , away_team , done
 
+    if done == True:
+        return JsonResponse("GameRunning", status=200, safe=False) 
     events_log = []
 
     home_team_id = home_id # Temporary until
@@ -126,6 +140,9 @@ def start_game(request, home_id, away_id): # for now team numbers are hard coded
     #get teams
     home_team = Team.objects.filter(team_id=home_team_id).first()
     away_team = Team.objects.filter(team_id=away_team_id).first()
+
+    event = Calendar.objects.filter(team_a=home_team ,date=date,  team_b = away_team).first()
+
 
     # get cards
     home_team_cards = list(Card.objects.filter(team_id__team_id=home_team_id).filter(is_first_five=True))
@@ -169,10 +186,9 @@ def start_game(request, home_id, away_id): # for now team numbers are hard coded
     scores = [0, 0]
 
     print("starting game : team {} vs team {}".format(home_team_id, away_team_id))
-    log_event("starting game : team 2 vs team 5")
 
     # run 4 quarters
-    for i in range(4) :
+    for i in range(1) :
         print("quarter {} is starting !".format(i+1))
         log_event("quarter {} is starting !".format(i+1))
         possession = team.HOME if i%2 == 0 else team.AWAY
@@ -196,7 +212,7 @@ def start_game(request, home_id, away_id): # for now team numbers are hard coded
         winner = team.AWAY
 
     update_league_entries(home_team, away_team, winner)
-
+    done = True
     return JsonResponse(events_log, status=200, safe=False)
 
 

@@ -1,6 +1,10 @@
 from django.conf.urls import url
+from django.urls import path
 from teams import views
 
 urlpatterns = [
-    url(r'get', views.team_get_all),
+    path('get_team_by_token', views.get_team_by_token, name = 'get_team_by_token'),
+    path('get_team_by_id/<int:pk>', views.get_team_by_id, name = 'get_team_by_id'),
 ]
+
+

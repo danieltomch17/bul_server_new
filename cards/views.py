@@ -81,21 +81,21 @@ def get_all_card_packs(request):
 def buy_card_pack(request):
     if request.method == 'POST':
         uid = request.user.id
-        team = Team.objects.filter(user_id__id = uid)
+        team = Team.objects.filter(user_id__id = uid).first()
         pack_id = request.data.get('pack_id')
-        cards_pack = CardPack.objects.filter(id=pack_id)
-        print(cards_pack[0].price)
-        print(team[0].cash)
-        if(team[0].cash < cards_pack[0].price):
+        cards_pack = CardPack.objects.filter(id=pack_id).first()
+        print(cards_pack.price)
+        print(team.cash)
+        if(team.cash < cards_pack.price):
             return JsonResponse("Not enough Cash", safe=False)
         else:
             cards = []
             for i in range(5):
-                card = create_random_card(team[0])
+                card = create_random_card(team)
                 card.save()
                 cards.append(card)
-            team[0].cash = int(team[0].cash) - int(cards_pack[0].price)
-            team[0].save()
+            team.cash = int(team.cash) - int(cards_pack.price)
+            team.save()
             cards_serializer = CardSerializer(cards, many=True)
             return JsonResponse(cards_serializer.data, safe=False)
 # internal functions

@@ -33,7 +33,7 @@ def user_create(request):
                 join_league = join_league_queryset.first()
                 
                 # create a team for the user
-                new_team = Team.objects.create(user_id = user, team_name = request.data['team_name'], league = join_league)
+                new_team = Team.objects.create(user_id = user, team_name = request.data['team_name'], league = join_league , logo=logo)
                 
                 # update league info
                 league_num_of_teams = join_league.num_of_teams + 1

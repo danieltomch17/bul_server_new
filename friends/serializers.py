@@ -9,6 +9,13 @@ class FriendsSerializer(serializers.ModelSerializer):
         model = Friends
         fields = ('team_b',)
 
+class FriendsRequestSerializer(serializers.ModelSerializer):
+    team_b = TeamSerializer()
+    team_a = TeamSerializer()
+    class Meta:
+        model = Friends
+        fields = ('team_b', 'team_a')
+
 class ChatSerializer(serializers.ModelSerializer):
     team_a = TeamSerializer()
     team_b = TeamSerializer()
