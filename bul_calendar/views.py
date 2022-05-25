@@ -1,6 +1,8 @@
 from django.shortcuts import render
 
 from django.http.response import JsonResponse
+from django.http import HttpResponse
+
 from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.decorators import api_view
@@ -83,8 +85,9 @@ def update_event_to_done(request):
         date = request.data.get('date', -1)
         team_send_to = Team.objects.filter(team_id=to_team_id)[0]
         current_team =  Team.objects.filter(user_id__id = uid)[0]
-        if(to_team_id != -1 and current_team != team_send_to):
+        if(to_team_id != -1 ):
             change_Calendar_request_to_true = Calendar.objects.filter(team_a=team_send_to ,date=date,  team_b = current_team).update(done=True)
-            return JsonResponse("Done", safe=False)
+            change_Calendar_request_to_true = Calendar.objects.filter(team_a=current_team ,date=date,  team_b = team_send_to).update(done=True)
+            return HttpResponse(status=200)
         else:
-             return JsonResponse("error")
+            return JsonResponse("error")
